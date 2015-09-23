@@ -1,0 +1,1 @@
+xcopy /E "site" "\Programmes\Wamp\www\site"
