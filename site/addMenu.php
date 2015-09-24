@@ -2,17 +2,17 @@
 /**
  * addMenu.php
  * Page permettant d'ajouter recettes et repas. 
- * programmé par Antony Garand
+ * programm&eacute; par Antony Garand
  * le 23 septembre 2015
  */
 ?>
 
-<?php require_once("./includes/beforeHTML.inc.php"); /* Entête HTML */ ?> 
+<?php require_once("./includes/beforeHTML.inc.php"); /* Entete HTML */ ?> 
 <?php require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */ ?>
 <?php require("./includes/header.inc.php"); /* Header du site web */?>
-<?php require("./includes/dbConfig.php"); /* Informations pour la base de donnée */?>
+<?php require("./includes/dbConfig.php"); /* Informations pour la base de donnee */?>
 <?php
-    /* Code pour la vérification de l'envoi d'un formulaire. */
+    /* Code pour la v&eacute;rification de l'envoi d'un formulaire. */
 	
     $requestMessage = array();
     $errors = array();
@@ -23,8 +23,12 @@
         if(isset($_POST['recette'])){
             $allGood = True;
             /* Verification des variables */
-            if(!empty($_POST['TempsPrep']) && !empty($_POST['TempsCuisson']) && !empty($_POST['TempsTotal'])&& !empty($_POST['ingredients'])&& !empty($_POST['preparation'])){
+            if(!empty($_POST['TempsPrep']) && !empty($_POST['TempsCuisson']) && !empty($_POST['TempsTotal'])&& !empty($_POST['ingredients'])&& !empty($_POST['preparation']) && !empty($_POST['recetteNom'])){
                 
+                if(!(is_string($_POST['recetteNom']) AND strlen($_POST['recetteNom']) <= 45)){
+                    $errors[] ="Nom de la recette manquant ou invalide!"; 
+                    $allGood = False;
+                }
                 if(!(is_string($_POST['TempsPrep']) AND strlen($_POST['TempsPrep']) <= 20)){
                     $errors[] ="Temps de pr&eacute;paration manquant ou invalide!"; 
                     $allGood = False;
@@ -51,30 +55,31 @@
             }
             else{
                 $allGood = False;
-                $errors[] = "Tout les champs n'ont pas étés remplis!";
+                $errors[] = "Tout les champs n'ont pas &eacute;t&eacute;s remplis!";
                 
             }
             if($allGood){
                 
                 @ $mysqli = new mysqli($dbHost,$dbUser,$dbPass,$dbName);
-                $recette = "INSERT INTO `monmenu_garandantony`.`recette` (`id`, `preparation`, `ingredients`, `tempsPreparation`, `tempsCuisson`, `tempsTotal`) VALUES (NULL, ?, ?, ?, ?, ?);";
+                $recette = "INSERT INTO `monmenu_garandantony`.`recette` (`id`, `nom`,`preparation`, `ingredients`, `tempsPreparation`, `tempsCuisson`, `tempsTotal`) VALUES (NULL, ?, ?, ?, ?, ?, ?);";
                 if($request = $mysqli->prepare($recette)){
+                    $nom = htmlspecialchars($_POST['recetteNom']);
                     $prep = htmlspecialchars($_POST['preparation']);
                     $ingredients = htmlspecialchars($_POST['ingredients']);
                     $tempsPrep = htmlspecialchars($_POST['TempsPrep']);
                     $tempsCuisson = htmlspecialchars($_POST['TempsCuisson']);
                     $tempsTotal = htmlspecialchars($_POST['TempsTotal']);
 
-                    $request->bind_param("sssss",$prep, $ingredients, $tempsPrep, $tempsCuisson, $tempsTotal);
+                    $request->bind_param("ssssss",$nom, $prep, $ingredients, $tempsPrep, $tempsCuisson, $tempsTotal);
                     $request->execute();
                     $request->close();
-                    $requestMessage[] = "La recette à été ajoutée avec succès!";
+                    $requestMessage[] = "La recette &agrave; &eacute;t&eacute; ajout&eacute;e avec succ&egrave;s!";
                 }
                 else{
                     $requestMessage[] = "Erreur avec la connection au serveur! <br/>Veuillez r&eacute;essayer plus tard.";
                 }
                 $id = $mysqli->insert_id;
-            } /* Fin de la vérif des conditions */
+            } /* Fin de la v&eacute;rif des conditions */
         } /* Fin de la partie recette */
 
         /* Verification si c'est un menu */
@@ -101,13 +106,13 @@
                     $allGood = False;
                 }
                 if(!(is_numeric($_POST['RecetteID']) AND $_POST['RecetteID'] > 0)){
-                    $errors[] ="La recette semble être invalde! Veuillez réessayer"; 
+                    $errors[] ="La recette semble &ecirc;tre invalde! Veuillez r&eacute;essayer"; 
                     $allGood = False;
                 }
 			}
 			else{
 				$allGood = False;
-				$errors[] = "Tout les champs n'ont pas étés remplis!";
+				$errors[] = "Tout les champs n'ont pas &eacute;t&eacute;s remplis!";
 			}
 			if($allGood){
 				/* Starting Mysqli connection */
@@ -117,7 +122,7 @@
 				$query = "SELECT * FROM `recette` WHERE recette.id = ".$_POST['RecetteID'].";";
 				$result = $mysqli->query($query);
 				if(!mysqli_num_rows($result)){
-					$errors[] = "La recette n'existe pas. <br/>Veuillez réessayer!";
+					$errors[] = "La recette n'existe pas. <br/>Veuillez r&eacute;essayer!";
 					$allGood = False;
 					@ $result->close();
 					@ $mysqli->close();
@@ -135,7 +140,7 @@
 						$request->bind_param("iiisi",$jour, $nbConvives, $repas, $description, $recetteID);
 						$request->execute();
 						$request->close();
-						$requestMessage[] = "Le repas à été ajouté avec succès!";
+						$requestMessage[] = "Le repas &agrave; &eacute;t&eacute; ajout&eacute; avec succ&egrave;s!";
 					}
 					else{
 						$requestMessage[] = "Erreur avec la connection au serveur! <br/>Veuillez r&eacute;essayer plus tard.";
@@ -143,11 +148,11 @@
 					@ $mysqli->close();
 				} /* Fin de l'ajout du repas */
 
-            } /* Fin de la vérification des champs valides*/
+            } /* Fin de la v&eacute;rification des champs valides*/
         
-        } /* Fin de la vérification du menu */
+        } /* Fin de la v&eacute;rification du menu */
         
-    } /* Fin de la vérification de l'envoi */
+    } /* Fin de la v&eacute;rification de l'envoi */
 
 ?>
 <!--Profile container-->
@@ -192,10 +197,31 @@
             <br/>
             <?php /* TODO: Select avec recette */ ?>
             Recette: 
-            <select id="RecetteID" name="RecetteID">
+            <select id="RecetteID" name="RecetteID" required>
                 <option value=""></option>
-            </select>
-            
+            <?php 
+                /* Format:  */
+                $query = 'SELECT recette.id, recette.nom FROM recette;';
+                @ $conn = new mysqli($dbHost,$dbUser,$dbPass,$dbName);
+                if(!$conn){
+                    die(echoDebug("Erreur de connection au serveur!",3));
+                }
+
+                $result = mysqli_query($conn, $query);
+                if($result->num_rows > 0){
+                    while($row = $result->fetch_row()){
+                        for ($i = 0; $i < sizeof($row); $i++){
+                            $row[$i] = htmlspecialchars(html_entity_decode($row[$i]));
+                        }
+                        printf("<option value=%s>%s</option>", $row[0], $row[1]);
+                    }
+                    echo("</select>");
+                }
+                else{
+                    echo("</select>");
+                    echoDebug("Aucune donn&eacute;e trouv&eacute;e!");
+                }
+            ?>
             <button name="submit" class="submit" type="submit" >Soumettre le menu</button>
             <input type="hidden" name="menu" id="menu">
         </form>
@@ -203,6 +229,10 @@
     <div class="span5">
         <h1>Ajouter une recette</h1>
         <form id="AddRecette" action="<?php echo($_SERVER['SCRIPT_NAME']); ?>" name="AddRecette" method="post" onkeydown="if (event.keyCode == 13) { this.form.submit(); return false; }">
+            Nom:
+            <br/>
+            <input id="recetteNom" name="recetteNom" type="text" maxLength=35 required>
+            <br/>
             Temps de Pr&eacute;paration:
             <br/>
             <input id="TempsPrep" name="TempsPrep" type="text" maxlength=20 required >
