@@ -10,122 +10,159 @@
 <?php require_once("./includes/beforeHTML.inc.php"); /* Entête HTML */ ?> 
 <?php require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */ ?>
 <?php require("./includes/header.inc.php"); /* Header du site web */?>
+<?php require("./includes/dbConfig.php"); /* Informations pour la base de donnée */?>
 <?php
-    /* Code pour la vérification du formulaire. */
-    $showMessage = False;
-    $requestMessage = "";
+    /* Code pour la vérification de l'envoi d'un formulaire. */
+	
+    $requestMessage = array();
     $errors = array();
     $allGood = True;
     /* Verification si un formulaire a ete envoye */
-    if(empty($_POST['submit'])){
+    if(isset($_POST['submit'])){
         /* Verification si c'est une recette. */
-        if(!empty($_POST['recette'])){
+        if(isset($_POST['recette'])){
             $allGood = True;
+            /* Verification des variables */
             if(!empty($_POST['TempsPrep']) && !empty($_POST['TempsCuisson']) && !empty($_POST['TempsTotal'])&& !empty($_POST['ingredients'])&& !empty($_POST['preparation'])){
-                 
+                
+                if(!(is_string($_POST['TempsPrep']) AND strlen($_POST['TempsPrep']) <= 20)){
+                    $errors[] ="Temps de pr&eacute;paration manquant ou invalide!"; 
+                    $allGood = False;
+                }
+                
+                if(!(is_string($_POST['TempsCuisson']) AND strlen($_POST['TempsCuisson']) <= 20)){
+                    $errors[] ="Temps de cuisson manquant ou invalide!"; 
+                    $allGood = False;
+                }
+                
+                if(!(is_string($_POST['TempsTotal']) AND strlen($_POST['TempsTotal']) <= 20)){
+                    $errors[] ="Temps de pr&eacute;paration manquant ou invalide!"; 
+                    $allGood = False;
+                }
+                if(!(is_string($_POST['ingredients']) AND strlen($_POST['ingredients']) <= 500)){
+                    $errors[] ="Ingredients manquant ou invalide!"; 
+                    $allGood = False;
+                }
+                
+                if(!(is_string($_POST['preparation']) AND strlen($_POST['preparation']) <= 500)){
+                    $errors[] ="Pr&eacute;paration manquante ou invalide!"; 
+                    $allGood = False;
+                }
             }
             else{
                 $allGood = False;
-                $showMessage = True;
-                $requestMessage[] = "";
+                $errors[] = "Tout les champs n'ont pas étés remplis!";
                 
             }
-        }
-        /* Verification si c'est un menu */
-        if(isSet($_POST['menu'])){
-
-        }
-
-        if(isSet($_POST['Description']) && isSet($_POST['Jours']) && isSet($_POST['Repas']) && isSet($_POST['NbConvives']) && isSet($_POST['TempsPrep']) && isSet($_POST['TempsCuisson']) && isSet($_POST['ingredients']) && isSet($_POST['preparation']))
-        {
-            if(!(is_string($_POST['Description']) AND strlen($_POST['Description']) <= 150 )){
-                $allGood = False;
-                $errors[] ="Description manquante ou invalide!";
-            }   
-            if(!(is_numeric($_POST['Jours']) AND $_POST['Jours'] > 0 AND $_POST['Jours'] <= 7 )){
-                $errors[] ="Jours manquant ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(!(is_numeric($_POST['Repas']) AND $_POST['Repas'] > 0 AND $_POST['Repas'] <= 3 )){
-                $errors[] ="Repas manquant ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(!(is_numeric($_POST['NbConvives']) AND $_POST['NbConvives'] > 0)){
-                $errors[] ="Nombre de convives manquant ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(!(is_string($_POST['TempsPrep']) AND strlen($_POST['TempsPrep']) <= 20) AND strlen($_POST['TempsPrep']) >= 2){
-                $errors[] ="Temps de pr&eacute;paration manquant ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(!(is_string($_POST['TempsCuisson']) AND strlen($_POST['TempsCuisson']) <= 20) AND strlen($_POST['TempsCuisson']) >= 2){
-                $errors[] ="Temps de cuisson manquant ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(!(is_string($_POST['ingredients']) AND strlen($_POST['ingredients']) <= 500) AND strlen($_POST['ingredients']) >= 2){
-                $errors[] ="Ingredients manquant ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(!(is_string($_POST['preparation']) AND strlen($_POST['preparation']) <= 500) AND strlen($_POST['preparation']) >= 2){
-                $errors[] ="Pr&eacute;paration manquante ou invalide!"; 
-                $allGood = False;
-            }
-            
-            if(FALSE){//$allGood){
-                @ $mysqli = new mysqli("127.0.0.1","rootjr","password","monmenu_garandantony");
-                $recette = "INSERT INTO `monmenu_garandantony`.`recette` (`id`, `preparation`, `ingredients`) VALUES (NULL, ?, ?);";
+            if($allGood){
+                
+                @ $mysqli = new mysqli($dbHost,$dbUser,$dbPass,$dbName);
+                $recette = "INSERT INTO `monmenu_garandantony`.`recette` (`id`, `preparation`, `ingredients`, `tempsPreparation`, `tempsCuisson`, `tempsTotal`) VALUES (NULL, ?, ?, ?, ?, ?);";
                 if($request = $mysqli->prepare($recette)){
-                    $request->bind_param("ss",htmlspecialchars($_POST['preparation']),htmlspecialchars($_POST['ingredients']));
+                    $prep = htmlspecialchars($_POST['preparation']);
+                    $ingredients = htmlspecialchars($_POST['ingredients']);
+                    $tempsPrep = htmlspecialchars($_POST['TempsPrep']);
+                    $tempsCuisson = htmlspecialchars($_POST['TempsCuisson']);
+                    $tempsTotal = htmlspecialchars($_POST['TempsTotal']);
+
+                    $request->bind_param("sssss",$prep, $ingredients, $tempsPrep, $tempsCuisson, $tempsTotal);
                     $request->execute();
                     $request->close();
+                    $requestMessage[] = "La recette à été ajoutée avec succès!";
                 }
                 else{
-                    $showMessage = True;
-                    $requestMessage = "Erreur avec la connection au serveur! <br/>Veuillez r&eacute;essayer plus tard.";
+                    $requestMessage[] = "Erreur avec la connection au serveur! <br/>Veuillez r&eacute;essayer plus tard.";
                 }
                 $id = $mysqli->insert_id;
-                if($id == 0){
-                    $errors[] = "Erreur dans l'&eacute;criture des donn&eacute;es! Veuillez r&eacute;essayer plus tard";
+            } /* Fin de la vérif des conditions */
+        } /* Fin de la partie recette */
+
+        /* Verification si c'est un menu */
+        if(isset($_POST['menu'])){
+            $allGood = True;
+
+            if(!empty($_POST['Description']) && !empty($_POST['Jours']) && !empty($_POST['Repas']) && !empty($_POST['RecetteID']) && !empty($_POST['NbConvives'])){
+                if(!(is_string($_POST['Description']) AND strlen($_POST['Description']) <= 150 )){
+                    $allGood = False;
+                    $errors[] ="Description manquante ou invalide!";
+                }   
+                if(!(is_numeric($_POST['Jours']) AND $_POST['Jours'] > 0 AND $_POST['Jours'] <= 7 )){
+                    $errors[] ="Jours manquant ou invalide!"; 
+                    $allGood = False;
                 }
-                else{
-                    $repas = "INSERT INTO `monmenu_garandantony`.`repas` (`id`, `jour`, `typeRepas`, `description`, `tempsPrep`, `tempsCuisson`, `recette_id`) VALUES (NULL,?,?,?,?,?,".$id.");";
-                    if($request = $mysqli->prepare($repas)){
-                        $request->bind_param("iisss",$_POST['Jours'],$_POST['Repas'],htmlspecialchars($_POST['Description']),htmlspecialchars($_POST['TempsPrep']),htmlspecialchars($_POST['TempsCuisson']));
-                        $request->execute();
-                        $showMessage = True;
-                        $requestMessage = "Les donn&eacute;es ont &eacute;t&eacute;s ajout&eacute;es avec succ&egrave;s!";
-                        $request->close(); 
-                    }
+                
+                if(!(is_numeric($_POST['Repas']) AND $_POST['Repas'] > 0 AND $_POST['Repas'] <= 3 )){
+                    $errors[] ="Repas manquant ou invalide!"; 
+                    $allGood = False;
                 }
-                @ $mysqli->close();
-            }
-        }
-        else{
-            $requestMessage = "Tout les champs n'ont pas &eacute;t&eacute;s remplis!"; 
-        }
-    }
+                
+                if(!(is_numeric($_POST['NbConvives']) AND $_POST['NbConvives'] > 0)){
+                    $errors[] ="Nombre de convives manquant ou invalide!"; 
+                    $allGood = False;
+                }
+                if(!(is_numeric($_POST['RecetteID']) AND $_POST['RecetteID'] > 0)){
+                    $errors[] ="La recette semble être invalde! Veuillez réessayer"; 
+                    $allGood = False;
+                }
+			}
+			else{
+				$allGood = False;
+				$errors[] = "Tout les champs n'ont pas étés remplis!";
+			}
+			if($allGood){
+				/* Starting Mysqli connection */
+				$mysqli = new mysqli($dbHost,$dbUser,$dbPass,$dbName);
+
+				/* Checking if ID exists */
+				$query = "SELECT * FROM `recette` WHERE recette.id = ".$_POST['RecetteID'].";";
+				$result = $mysqli->query($query);
+				if(!mysqli_num_rows($result)){
+					$errors[] = "La recette n'existe pas. <br/>Veuillez réessayer!";
+					$allGood = False;
+					@ $result->close();
+					@ $mysqli->close();
+				}
+				else{
+				
+					$recette = "INSERT INTO `monmenu_garandantony`.`repas` (`id`, `jour`, `nbConvives`, `typeRepas`, `description`, `recette_id`) VALUES(NULL, ?, ?, ?, ?, ?);";
+					if($request = $mysqli->prepare($recette)){
+						$jour = $_POST['Jours'];
+						$repas = $_POST['Repas'];
+						$nbConvives = $_POST['NbConvives'];
+						$description = htmlspecialchars($_POST['Description']);
+						$recetteID = $_POST['RecetteID'];
+						
+						$request->bind_param("iiisi",$jour, $nbConvives, $repas, $description, $recetteID);
+						$request->execute();
+						$request->close();
+						$requestMessage[] = "Le repas à été ajouté avec succès!";
+					}
+					else{
+						$requestMessage[] = "Erreur avec la connection au serveur! <br/>Veuillez r&eacute;essayer plus tard.";
+					}
+					@ $mysqli->close();
+				} /* Fin de l'ajout du repas */
+
+            } /* Fin de la vérification des champs valides*/
+        
+        } /* Fin de la vérification du menu */
+        
+    } /* Fin de la vérification de l'envoi */
 
 ?>
 <!--Profile container-->
 <div class="container profile">
+	<?php 
+		if(!empty($errors)){
+			echo("<br/>");
+			echoDebug(sprintf("%s", "<br/>".implode('<br/>',$errors)),2);
+		}
+		if(!empty($requestMessage)){
+			echoDebug((sprintf("%s", "<br/>".implode('<br/>',$requestMessage))));    
+		}
+	?>
     <div class="span5">
-        <?php 
-            if(!$allGood){
-                echo("<br/>");
-                echoDebug(sprintf("%s", "<br/>".implode('<br/>',$errors)),2);
-            }
-            else{
-                if($showMessage){
-                    echoDebug($requestMessage);    
-                }
-            }
-        ?>
+        
         <h1>Ajouter un menu</h1>
 
         <form id="AddMenu" action="<?php echo($_SERVER['SCRIPT_NAME']); ?>" name="AddMenu" method="post" onkeydown="if (event.keyCode == 13) { this.form.submit(); return false; }">
