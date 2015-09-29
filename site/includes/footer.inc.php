@@ -33,7 +33,9 @@
 </div>
 <!-- Scripts -->
 <script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://code.jquery.com/ui/jquery-ui-git.js"></script>
 <script src="includes/js/bootstrap.min.js"></script>
+<script src="includes/js/script.js"></script>
 <script>
             $('#myModal').modal('hidden')
     </script>
