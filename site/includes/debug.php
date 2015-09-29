@@ -27,7 +27,7 @@ function echoDebug($message, $type = 1){
     $msgAlert = "Info!";
     if($type == 0){
         $class = "alert-success";
-        $msgAlert = "Succès!";
+        $msgAlert = "Succ&egrave;s!";
     }
     else if($type == 2){
         $class = "alert-warning";
