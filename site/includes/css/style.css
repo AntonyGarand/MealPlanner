@@ -35,9 +35,9 @@ a.brand img {
 .profile .container .span5 {
 	padding:40px 0;
 }
-button {
+button.addRecette, button.submit {
 	display: inline-block;
-    *display: inline;
+        *display: inline;
 	padding:20px 60px;
 	background:#39d084;
 	color:#fff;
@@ -309,3 +309,4 @@ table, th, td{
 th, td{
     padding: 13px 7px 2px 7px;
 }
+

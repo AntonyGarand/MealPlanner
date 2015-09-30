@@ -37,7 +37,7 @@ function echoDebug($message, $type = 1){
         $class = "alert-danger";
         $msgAlert = "Danger!";
     }
-    echo("<div class=\"alert ".$class."\">
+    echo("<div class=\"alert ".$class." alert-dismissible fade in\" role='alert'>
             <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">X</a> 
             <strong>".$msgAlert."</strong> ".$message."
         </div>");

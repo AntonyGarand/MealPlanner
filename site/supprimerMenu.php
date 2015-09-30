@@ -16,7 +16,7 @@
         /* Checking if ID exists in database */
         $query = "SELECT * FROM `repas` WHERE repas.id = ".$_POST['repasID'].";";
         $result = $mysqli->query($query);
-        if(!mysqli_num_rows($result)){
+        if($result AND !mysqli_num_rows($result)){
                 @ $result->close();
                 @ $mysqli->close();
                 die(echoDebug("La recette n'existe pas. <br/>Veuillez r&eacute;essayer!",2));
