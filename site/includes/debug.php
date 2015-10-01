@@ -14,6 +14,18 @@ if ($debug) {
     // g&egrave;re et affiche tous les niveaux d'erreurs en mode d&eacute;bogage
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
+	/* Si on est en mode deboguage, permet d'acitver l'extension PHP console dans chrome */
+    require_once('PhpConsole.phar');
+    $connector = PhpConsole\Connector::getInstance();
+	/* Permet d'executer du php par le navigateur avec le mot de passe "password" */
+    $connector->setPassword('password');
+
+    // Configure eval provider
+    $evalProvider = $connector->getEvalDispatcher()->getEvalProvider();
+    $evalProvider->addSharedVar('post', $_POST); // so "return $post" code will return $_POST
+    $evalProvider->setOpenBaseDirs(array(__DIR__)); // see http://php.net/open-basedir
+
+    $connector->startEvalRequestsListener(); // must be called in the end of all configurations
 }
 else {
     // en mode production, ne g&egrave;re pas certains niveaux pour des raisons de performance (ceux pr&eacute;c&eacute;d&eacute;s de ~), tel que sugg&eacute;r&eacute; dans php.ini
