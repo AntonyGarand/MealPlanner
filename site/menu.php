@@ -6,18 +6,28 @@
  * le 8 septembre 2015
  */
 ?>
-
 <?php require_once("./includes/dbConfig.php"); /* Informations pour la base de donnee */?>
 <?php require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */ ?>
+<?php
+@session_start();
+if(!empty($_SESSION)){
+    $requestMessage = $_SESSION['message'];
+    session_unset();
+}
+
+?>
 <?php require_once("./includes/beforeHTML.inc.php"); /* Entete HTML */ ?> 
 <?php require("./includes/header.inc.php"); /* Header du site web */?>
-
 <!--Profile container-->
 <div class="container profile">
     <div class="span11">
         <h1>Le Menu</h1>
-        <h3>Yay!</h3>
         <?php 
+            /* &Eacute;criture des message si venons d'ajouter un repas */
+            if(!empty($requestMessage)){
+                    echoDebug((sprintf("%s", "<br/>".implode('<br/>',$requestMessage))));    
+            }
+
             /* Format: Jour, type, nb personnes, description, recette nom, temps prep, temps cuisson, temps total, ingredients, preparation */
             $query = 'SELECT repas.jour, repas.typeRepas, repas.nbConvives, repas.description, recette.nom, recette.tempsPreparation, recette.tempsCuisson, recette.tempsTotal, recette.ingredients, recette.preparation, repas.id FROM repas INNER JOIN recette on recette.id = repas.recette_id';
             @ $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);

@@ -6,7 +6,6 @@
  * le 23 septembre 2015
  */
 ?>
-
 <?php require_once("./includes/beforeHTML.inc.php"); /* Entete HTML */ ?> 
 <?php require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */ ?>
 <?php require("./includes/header.inc.php"); /* Header du site web */?>
@@ -152,7 +151,22 @@
         
         } /* Fin de la v&eacute;rification du menu */
         
+
     } /* Fin de la v&eacute;rification de l'envoi */
+    /* V&eacute;rification du succ&egrave;s de l'ajout */
+
+    /* V&eacute;rification d'un ajout de recette */
+    foreach ($requestMessage as $message){
+        /* Si "succes" dans les messages:
+         *  redirection vers la page menu.php 
+         *  Ajout des message dans la variable $_SESSION['message']
+         */
+        if(strpos($message, "succ&egrave;s")){
+            @session_start();
+            $_SESSION['message'] = $requestMessage;
+            die(header("Location: menu.php"));
+        }
+    }
 
 ?>
 <!--Profile container-->
