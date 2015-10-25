@@ -2,16 +2,15 @@
 /**
  * addMenu.php
  * Page permettant d'ajouter recettes et repas. 
- * programm&eacute; par Antony Garand
+ * programme par Antony Garand
  * le 23 septembre 2015
  */
 ?>
-<?php require_once("./includes/beforeHTML.inc.php"); /* Entete HTML */ ?> 
+<?php require_once("./includes/beforeHTML.inc.php"); /* Variables utiles */ ?> 
 <?php require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */ ?>
 <?php require("./includes/header.inc.php"); /* Header du site web */?>
-<?php require("./includes/dbConfig.php"); /* Informations pour la base de donnee */?>
 <?php
-    /* Code pour la v&eacute;rification de l'envoi d'un formulaire. */
+    /* Code pour la verification de l'envoi d'un formulaire. */
 	
     $requestMessage = array();
     $errors = array();
@@ -172,23 +171,29 @@
 <!--Profile container-->
 <div class="container profile">
 	<?php 
+                @ $conn = new mysqli($dbHost,$dbUser,$dbPass,$dbName);
+                if(!$conn){
+                    
+                    echoDebug("Erreur de connection au serveur!",3);
+                }
 		if(!empty($errors)){
-			echo("<br/>");
-			echoDebug(sprintf("%s", "<br/>".implode('<br/>',$errors)),2);
+                    echo("<br/>");
+                    echoDebug(sprintf("%s", "<br/>".implode('<br/>',$errors)),2);
 		}
 		if(!empty($requestMessage)){
-			echoDebug((sprintf("%s", "<br/>".implode('<br/>',$requestMessage))));    
+                    echoDebug((sprintf("%s", "<br/>".implode('<br/>',$requestMessage))));    
 		}
 	?>
+    <h4>Tout les champs sont obligatoires. Il n'y a donc pas d'astérix afin de signaler les champs importants.</h4>
     <div class="span5">
         
         <h1>Ajouter un menu</h1>
-
         <form id="AddMenu" action="<?php echo($_SERVER['SCRIPT_NAME']); ?>" name="AddMenu" method="post" onkeydown="if (event.keyCode == 13) { this.form.submit(); return false; }">
             <label for="Description">Description:</label>
             <input id="Description" name="Description" type="text" maxlength=150 autofocus required>
             <br/>
             Jour:
+            <br/>
             <select id="Jours" name="Jours" >
                 <option value=1>Lundi</option>
                 <option value=2>Mardi</option>
@@ -200,6 +205,7 @@
             </select>
             <br/>
             Repas:
+            <br/>
             <select id="Repas" name="Repas" >
                 <option value="1">D&eacute;jeuner</option>
                 <option value="2">Diner</option>
@@ -211,15 +217,12 @@
             <br/>
             <?php /* TODO: Select avec recette */ ?>
             Recette: 
+            <br/>
             <select id="RecetteID" name="RecetteID" required>
-                <option value=""></option>
+                <option value="">Recette</option>
             <?php 
                 /* Format:  */
                 $query = 'SELECT recette.id, recette.nom FROM recette;';
-                @ $conn = new mysqli($dbHost,$dbUser,$dbPass,$dbName);
-                if(!$conn){
-                    die(echoDebug("Erreur de connection au serveur!",3));
-                }
 
                 $result = mysqli_query($conn, $query);
                 if($result->num_rows > 0){

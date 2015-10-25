@@ -1,6 +1,6 @@
 <?php 
     if(!empty($_POST['repasID'])){
-        require_once("./includes/dbConfig.php"); /* Informations pour la base de donnee */
+        require_once("./includes/beforeHtml.inc.php"); /* Informations pour la base de donnee */
         require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */
         
         /* Checking if the ID is valid */

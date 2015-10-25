@@ -6,6 +6,11 @@
  * le 23 septembre 2015
  */
 ?>
+<?php 
+if(!empty($conn)){
+    @$conn->close();
+}
+?>
 <!-- Footer -->
 <div class="footer">
   <div class="container">

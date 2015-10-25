@@ -2,7 +2,7 @@
 /**
  * index.php
  * page d'accueil pour le site de repas…
- * programm&eacute; par Antony Garand
+ * programme par Antony Garand
  * le 8 septembre 2015
  */
 ?>
@@ -15,6 +15,7 @@
 <!--Profile container-->
 <div class="container profile">
     <div class="span11">
+        <p>Ce site permet de se cr&eacute;er un horaire de menus compos&eacute;s de repas.</p>
         <a href="addMenu.php" class="button">Ajouter un menu</a>
         <br/>
         <a href="menu.php" class="button">Afficher les donn&eacute;es du menu</a>

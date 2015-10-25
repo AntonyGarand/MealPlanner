@@ -8,7 +8,10 @@
 ?>
 <?php  
 
-$debug = true;
+if(empty($debug)){
+    global $debug;
+    $debug = false;
+}
 
 if ($debug) {
     // g&egrave;re et affiche tous les niveaux d'erreurs en mode d&eacute;bogage
@@ -18,6 +21,7 @@ if ($debug) {
     require_once('PhpConsole.phar');
     $connector = PhpConsole\Connector::getInstance();
 	/* Permet d'executer du php par le navigateur avec le mot de passe "password" */
+    
     $connector->setPassword('password');
 
     // Configure eval provider
@@ -33,6 +37,11 @@ else {
     error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
     ini_set('display_errors', '0');
 }   
+
+
+if($debug){
+    
+}
 
 function echoDebug($message, $type = 1){
     $class = "alert-info";
@@ -53,4 +62,27 @@ function echoDebug($message, $type = 1){
             <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">X</a> 
             <strong>".$msgAlert."</strong> ".$message."
         </div>");
+}
+
+function echoDoNotShowIfDebug($message, $type = 1){
+    if($debug){
+        $class = "alert-info";
+        $msgAlert = "Info!";
+        if($type == 0){
+            $class = "alert-success";
+            $msgAlert = "Succ&egrave;s!";
+        }
+        else if($type == 2){
+            $class = "alert-warning";
+            $msgAlert = "Attention!";
+        }
+        else if($type == 3){
+            $class = "alert-danger";
+            $msgAlert = "Danger!";
+        }
+        echo("<div class=\"alert ".$class." alert-dismissible fade in\" role='alert'>
+                <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">X</a> 
+                <strong>".$msgAlert."</strong> ".$message."
+            </div>");
+    }
 }

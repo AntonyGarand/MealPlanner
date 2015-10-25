@@ -35,9 +35,8 @@ a.brand img {
 .profile .container .span5 {
 	padding:40px 0;
 }
-button.addRecette, button.submit {
-	display: inline-block;
-        *display: inline;
+button.addRecette, button.submit, a.addRecette {
+    display: inline-block;
 	padding:20px 60px;
 	background:#39d084;
 	color:#fff;
@@ -54,8 +53,7 @@ button:hover {
 }
 
 .button {
-	display: inline-block;
-    *display: inline;
+    display: inline-block;
 	padding:20px 60px;
 	background:#39d084;
 	color:#fff;

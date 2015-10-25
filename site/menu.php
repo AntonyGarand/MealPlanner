@@ -2,22 +2,21 @@
 /**
  * index.php
  * page d'accueil pour le site de repas…
- * programm&eacute; par Antony Garand
+ * programme par Antony Garand
  * le 8 septembre 2015
  */
 ?>
-<?php require_once("./includes/dbConfig.php"); /* Informations pour la base de donnee */?>
 <?php require_once("./includes/debug.php"); /* Fonctions et variables de deboguage */ ?>
+<?php require_once("./includes/beforeHTML.inc.php"); /* Variables */ ?> 
+<?php require("./includes/header.inc.php"); /* Header du site web */?>
 <?php
 @session_start();
-if(!empty($_SESSION)){
+if(!empty($_SESSION['message'])){
     $requestMessage = $_SESSION['message'];
-    session_unset();
+    unset($_SESSION['message']);
 }
 
 ?>
-<?php require_once("./includes/beforeHTML.inc.php"); /* Entete HTML */ ?> 
-<?php require("./includes/header.inc.php"); /* Header du site web */?>
 <!--Profile container-->
 <div class="container profile">
     <div class="span11">
@@ -29,7 +28,7 @@ if(!empty($_SESSION)){
             }
 
             /* Format: Jour, type, nb personnes, description, recette nom, temps prep, temps cuisson, temps total, ingredients, preparation */
-            $query = 'SELECT repas.jour, repas.typeRepas, repas.nbConvives, repas.description, recette.nom, recette.tempsPreparation, recette.tempsCuisson, recette.tempsTotal, recette.ingredients, recette.preparation, repas.id FROM repas INNER JOIN recette on recette.id = repas.recette_id';
+            $query = 'SELECT repas.jour, repas.typeRepas, repas.nbConvives, repas.description, recette.nom, recette.tempsPreparation, recette.tempsCuisson, recette.tempsTotal, recette.ingredients, recette.preparation, repas.id FROM repas INNER JOIN recette on recette.id = repas.recette_id ORDER BY repas.jour, repas.typeRepas';
             @ $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
             if(!$conn){
                 die(echoDebug("Erreur de connection au serveur!",3));
@@ -77,8 +76,11 @@ if(!empty($_SESSION)){
             else{
                 echoDebug("Aucune donn&eacute;e trouv&eacute;e!");
             }
-            echo("<a href=\"index.php\"><button name=\"addRecette\" class=\"addRecette\"> Ajouter un nouveau repas! </button></a>")
+            echo("<a href=\"addMenu.php\" class=\"addRecette\">Ajouter un nouveau repas!</a>");
         ?>
+        <br/>
+        <br/>
+        <br/>
     </div>
 </div>
 <!--END: Profile container-->
